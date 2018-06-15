@@ -1,0 +1,8 @@
+auto-save-list/
+elpa/
+history
+init.el~
+session.*
+tramp
+url/
+
