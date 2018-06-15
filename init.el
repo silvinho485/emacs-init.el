@@ -20,7 +20,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (jedi w3m))))
+ '(package-selected-packages (quote (emmet-mode python-django jedi w3m))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -70,7 +70,10 @@
 
 (delete-selection-mode 1)
 
-(setq python-shell-interpreter "/Users/silvio/.pyenv/shims/python")
+(if (equal system-type 'darwin)  
+    (setq python-shell-interpreter "/Users/silvio/.pyenv/shims/python")
+  (setq python-shell-interpreter "/bin/python3.5"))
+
 (setq tab-always-indent 'complete)
 
 (defvar elmord/c-style
@@ -84,3 +87,45 @@
 (c-add-style "elmord" elmord/c-style)(setq c-default-style "elmord")
 
 (electric-pair-mode 1)
+
+(show-paren-mode 1)
+;; Changing window focus.
+(global-set-key (kbd "M-S-<up>") 'windmove-up)
+(global-set-key (kbd "M-S-<down>") 'windmove-down)
+(global-set-key (kbd "M-S-<left>") 'windmove-left)
+(global-set-key (kbd "M-S-<right>") 'windmove-right)
+
+;; Run python and pop-up its shell.
+;; Kill process to solve the reload modules problem.
+(defun my-python-shell-run ()
+  (interactive)
+  (when (get-buffer-process "*Python*")
+     (set-process-query-on-exit-flag (get-buffer-process "*Python*") nil)
+     (kill-process (get-buffer-process "*Python*"))
+     ;; If you want to clean the buffer too.
+     ;;(kill-buffer "*Python*")
+     ;; Not so fast!
+     (sleep-for 0.5))
+  (run-python (python-shell-parse-command) nil nil)
+  (python-shell-send-buffer)
+  ;; Pop new window only if shell isnt visible
+  ;; in any frame.
+  (unless (get-buffer-window "*Python*" t) 
+    (python-shell-switch-to-shell)))
+
+(defun my-python-shell-run-region ()
+  (interactive)
+  (python-shell-send-region (region-beginning) (region-end))
+  (python-shell-switch-to-shell))
+
+(eval-after-load "python"
+  '(progn
+     (define-key python-mode-map (kbd "C-c C-c") 'my-python-shell-run)
+     (define-key python-mode-map (kbd "C-c C-r") 'my-python-shell-run-region)
+     (define-key python-mode-map (kbd "C-h f") 'python-eldoc-at-point)))
+
+(add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+(add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+
+;; Auto-refresh dired on file change
+(add-hook 'dired-mode-hook 'auto-revert-mode)
