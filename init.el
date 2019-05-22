@@ -20,7 +20,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (emmet-mode python-django jedi w3m))))
+ '(package-selected-packages
+   (quote
+    (fill-column-indicator emmet-mode python-django jedi w3m)))
+ '(show-paren-mode t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -129,3 +132,14 @@
 
 ;; Auto-refresh dired on file change
 (add-hook 'dired-mode-hook 'auto-revert-mode)
+
+;; auto on fci-mode
+(define-globalized-minor-mode my-global-fci-mode fci-mode turn-on-fci-mode)
+(my-global-fci-mode 1)
+
+;; set fill collumn default to 80
+(setq-default fill-column 80)
+
+;; set_trace() macro
+(fset 'python-strace
+   [C-home return up ?i ?m ?p ?o ?r ?t ?  ?p ?d ?b ?\C-u ?\C-  ?i ?f ?  ?c ?o ?n ?d ?i ?t ?i ?o ?n ?: return ?p ?d ?b ?. ?s ?e ?t ?_ ?t ?r ?a ?c ?e ?\(])
